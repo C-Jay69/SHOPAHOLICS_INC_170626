@@ -1,0 +1,211 @@
+# ***SHOPAHOLICS BUILD PROMPT. VERY LATEST. UPDATED JUN 27 2026***
+
+**Prompt:**
+
+Build a full-stack e-commerce platform named **Shopaholics Inc** hosted at [**https://shopaholicsinc.**com](https://shopaholicsinc.com). The goal is a multi-category online store with a broad product spectrum across consolidated categories and logical subcategory navigation, designed to be **ultra-modern, clean, minimalistic**, and focused on **speed, usability, and professional aesthetics**—with a tongue-in-cheek, sarcastic edge that keeps it fun without taking itself too seriously. The brand mantra is professional, customer-first, but never up its own arse: think witty UI copy like “Oops, we got cut off… or did we?” for customer service or “Three lava lamps? Even Austin Powers would say chill, mate” for cart nudges. Avoid animations, popups, games, or visual clutter—deliver a sleek, functional experience that appeals to everyone without overwhelming. Use generous white space, grid-based layouts, and prioritize sub-2-second load times on desktop and sub-3 seconds on mobile via lazy loading, WebP image compression, and above-the-fold prioritization. Encourage social sharing (e.g., “Brag about your savvy buy on X\!”) to drive word-of-mouth on platforms like TikTok and Instagram.
+
+---
+
+#### **🎨 Branding & Design**
+
+* **Site Name:** Shopaholics Inc  
+* **Brand Mantra:** Professional, customer-obsessed, with playful sarcasm—think a savvy mate who saves you from bad buys, not a corporate drone.  
+* **Primary Colors (use tastefully to avoid neon chaos):**  
+  * **Overall Style & Layout:**  
+  * **Framework: Next.js with Tailwind CSS**  
+  * **Layout Structure: Full-width, centered content with max-w-7xl containers**  
+  * **Background: Predominantly bg-black (black) with gradient accents**  
+  * **Typography: Large, bold headings with gradient text effects**  
+  * **Sections: Each section uses py-20 lg:py-32 for vertical spacing**  
+  * **Grid System: Uses grid lg:grid-cols-2 for two-column layouts on larger screens**  
+  * **Color Palette (Hex Values & Tailwind Classes):**  
+    * **Backgrounds:**  
+  * **Black: \#000000 (bg-black)**  
+  * **Dark Gray: \#2a2a2a (bg-\[\#2a2a2a\])**  
+  * **Gray 900: \#111827 (bg-gray-900)**  
+  * **Gradients:**  
+  * **from-gray-900 to-black**  
+  * **from-purple-500 to-cyan-500**  
+    * **Text Colors:**  
+  * **White: \#ffffff (text-white)**  
+  * **Gray 300: \#d1d5db (text-gray-300)**  
+  * **Gray 400: \#9ca3af (text-gray-400)**  
+  * **Gray 500: \#6b7280 (text-gray-500)**  
+  * **Gray 600: \#4b5563 (text-gray-600)**  
+  * **Transparent Gradients:**  
+  * **from-blue-400 to-cyan-400**  
+  * **from-purple-400 to-blue-400**  
+    * **Borders:**  
+  * **Gray 800: \#1f2937 (border-gray-800)**  
+  * **White: \#ffffff (border-white)**  
+    * **Accent & Gradient Colors:**  
+  * **Blue 400: \#60a5fa (from-blue-400)**  
+  * **Cyan 400: \#22d3ee (to-cyan-400)**  
+  * **Purple 400: \#c084fc (from-purple-400)**  
+  * **Purple 500: \#a855f7 (from-purple-500)**  
+  * **Cyan 500: \#06b6d4 (to-cyan-500)**  
+  * **Key Visual Features:**  
+  * **Gradient Text: Used in all major headings (bg-gradient-to-r with bg-clip-text text-transparent)**  
+  * **Gradient Backgrounds: Used in buttons and feature icons**  
+  * **Card Styles: Dark cards (\#2a2a2a) with rounded corners (rounded-lg)**  
+  * **Image Placeholders: Gray background (bg-gray-900) with centered placeholder text**  
+  * **Button Styles:**  
+  * **Primary: Gradient (from-purple-500 to-cyan-500) with white text**  
+  * **Secondary: White border (border-2 border-white) with hover effect to invert colors**  
+  * **Layout Summary:**  
+  * **Navigation: Fixed top bar with logo and links**  
+  * **Hero Section: Two-column layout with headline and placeholder image**  
+  * **Feature Sections: Alternating two-column layouts with text on left/right**  
+  * **Process Steps: Three-column grid for numbered steps**  
+  * **CTA Section: Centered call-to-action with gradient background**  
+  * **Footer: Simple centered text with border**  
+  * **Responsive Design:**  
+  * **Uses Tailwind's responsive prefixes (lg:, md:)**  
+  * **Stacked columns on mobile, side-by-side on desktop**  
+  * **Font sizes scale with viewport (text-5xl lg:text-7xl)**
+
+---
+
+#### **🛒 Core Features**
+
+##### **1\. Multi-Category Navigation**
+
+Create a streamlined navigation system with consolidated main categories to keep it intuitive for a broad product catalog:
+
+* **Electronics & Computers**: Headphones, Cameras, Wearable Tech, Laptops, Desktops, Accessories  
+* **Smart Home**: Lights, Security, Hubs  
+* **Fashion**: Women’s (Clothing, Shoes, Accessories), Men’s (Shirts, Pants, Footwear)  
+* **Kids & Baby**: Girls’ (Dresses, Outerwear), Boys’ (Tops, Bottoms), Baby Gear, Clothing, Toys  
+* **Beauty & Health**: Skincare, Haircare, Makeup, Vitamins, Personal Care  
+* **Home & Kitchen**: Cookware, Furniture, Decor, Cleaning Supplies  
+* **Automotive & Tools**: Tools, Car Care, Electronics, Power Tools, Plumbing, Home Improvement  
+* **Pets & Outdoors**: Dog, Cat, Bird, Fish Supplies; Fitness, Camping, Cycling, Sports Gear  
+* **Arts, Crafts & Hobbies**: Painting, Scrapbooking, DIY Kits, Board Games, Action Figures, Toys  
+* **Travel & Luggage**: Suitcases, Travel Accessories  
+* Each main category gets a dedicated page with filterable subcategories in a sidebar (desktop) or expandable dropdown (mobile). Keep menus clean to avoid overwhelming users.
+
+##### **2\. Standout Feature: Shopaholics Anonymous Mate (AI Impulse Control Coach with Dupe Finder)**
+
+Build an optional, toggleable AI feature called the **Shopaholics Anonymous Mate**, a witty, sarcastic assistant that curbs impulse buys and suggests budget-friendly dupes to save users money, boosting long-term retention. Features:
+
+* **Impulse Control:** Analyzes cart contents and browsing habits (e.g., “Three pairs of trainers at 2 a.m.? Let’s have a word, mate.”), suggesting wishlist saves, a “cool-off” timer, or budget limit nudges (optional user-set budgets or bank API integration with permission).  
+* **Dupe Finder:** For pricier items, suggests cheaper alternatives from the broad catalog (e.g., “Fancy that £300 smartwatch? This £80 one’s got the same heart-rate tracker and won’t make your wallet weep—just sayin’.”). Uses product specs, materials, and reviews for accurate matches.  
+* **Rewards for Restraint:** Offer small discounts or loyalty points for opting into the Mate or choosing dupes (e.g., “Nice one for dodging that £200 jacket—here’s 5% off your next buy\!”).  
+* **Social Sharing:** Let users share savvy purchases (e.g., “I saved £100 with Shopaholics Inc’s Dupe Finder\! \#SmartShopping” on X, TikTok, or Instagram).  
+* Display as a subtle dashboard widget or sidebar nudge, keeping the UI clean. Ensure it’s opt-in to avoid annoying users who want to splurge. Tone: Cheeky but helpful (e.g., “Mate, you don’t need another gadget to impress nobody—try this £50 dupe instead.”).
+
+##### **3\. Product Pages**
+
+* High-resolution image gallery with zoom and lazy loading.  
+* Clear display of price, color/size/quantity options, and “Add to Cart”/“Buy Now” buttons.  
+* Include product description, specifications, and SKU.  
+* Optional customer reviews (1–5 star ratings \+ text, with a wink: “Rate this or we’ll assume you’re chuffed to bits.”).  
+* Dupe Finder nudge on pricier items (e.g., “Psst, check this cheaper alternative before you commit\!”).
+
+##### **4\. Shopping Cart & Checkout**
+
+* Persistent cart icon in header showing item count.  
+* Cart page: List items, edit quantities, remove items, display subtotal, with witty prompts (e.g., “Cart’s heavier than a Sunday roast—sure you need it all?”).  
+* Stepped checkout (Shipping → Payment → Confirm) with **guest checkout option** for mobile-friendly simplicity.  
+* Checkout fields: Shipping address, email, payment details.  
+* **Stripe Integration**: Accept credit/debit cards in test (sandbox) and live modes. Use Stripe webhooks for order updates. No PayPal bloat.
+
+##### **5\. User Accounts**
+
+* Sign-up/login via email+password or Google OAuth.  
+* User dashboard with:  
+  * Order history (“Your past splurges, in all their glory”).  
+  * Saved addresses.  
+  * Wishlist (heart icon on products, “Save it for when you’re feeling flush”).  
+  * Impulse Coach settings (toggle Mate, set budget limits).  
+* Password reset flow with email verification.
+
+##### **6\. Search & Filters**
+
+* Search bar with auto-suggestions for product names and brands.  
+* Filters: Price range, brand, color, rating (1–5 stars), availability.
+
+##### **7\. Responsive Design**
+
+* Flawless performance on mobile, tablet, and desktop with touch-friendly elements.  
+* Use lazy loading, WebP image compression, and caching to hit load time targets.
+
+---
+
+#### **🔐 Admin Panel**
+
+* **URL:** https://shopaholicsinc.com/admin  
+* **Default Login:**  
+  * Username: admin@shopaholicsinc.store  
+  * Force a password reset on first login (send a temporary password via email for security).  
+* **Features:**  
+* **First and foremost, you must generate a large capacity, web, product scraping agent, that can scrape hundreds of products from sites such as AliExpress, CJDropShipping, Alibaba etc. It must be able to bypass any of the standard bot detectors and return a csv file containing “ An average e-commerce product CSV file typically includes the following columns:**  
+*   
+* **1\. \*\*Product ID\*\*: A unique identifier for each product.**  
+* **2\. \*\*Product Name\*\*: The name or title of the product.**  
+* **3\. \*\*Description\*\*: A brief description of the product.**  
+* **4\. \*\*Price\*\*: The selling price of the product.**  
+* **5\. \*\*SKU (Stock Keeping Unit)\*\*: A unique code for inventory management.**  
+* **6\. \*\*Category\*\*: The category or type the product belongs to.**  
+* **7\. \*\*Stock Quantity\*\*: The number of items available for sale.**  
+* **8\. \*\*Image URL\*\*: A link to the product image.**  
+* **9\. \*\*Weight\*\*: The weight of the product (if applicable).**  
+* **10\. \*\*Dimensions\*\*: The size of the product (length, width, height).**  
+* **11\. \*\*Brand\*\*: The manufacturer or brand name.**  
+* **12\. \*\*Tags\*\*: Keywords associated with the product for SEO.**  
+* **13\. \*\*Status\*\*: Whether the product is active, inactive, or discontinued.**  
+* **14\. \*\*Date Added\*\*: The date the product was added to the catalog.**  
+* **15\. \*\*Discount\*\*: Any applicable discount or promotional price.**
+
+Add/edit/delete products (image uploads, price, inventory/stock count, detailed specs for Dupe Finder accuracy).
+
+* View all orders with statuses: Pending, Shipped, Delivered.  
+  * Manage categories/subcategories (create, rename, delete).  
+  * View customer list (name, email, order count—no passwords visible).  
+  * Export sales data as CSV.  
+  * Toggle Stripe payments (enable/disable).  
+  * Site settings: Update site title, logo, colors.  
+  * Impulse Coach analytics: Track usage (e.g., % opting in, average savings, dupe selections).
+
+---
+
+#### **🌐 Tech Stack**
+
+* **Frontend:** Responsive React with Server-Side Rendering (SSR) for SEO.  
+* **Backend:** Node.js serverless functions via Encore.  
+* **Database:** PostgreSQL (via Encore) for products, users, orders, settings—optimized with indexing and caching for scalability across a broad catalog.  
+* **Authentication:** Email/password \+ Google OAuth.  
+* **Hosting:** Vercel with global CDN for speed.  
+* **Payments:** Stripe with webhooks for order updates.  
+* **Security:** HTTPS, bcrypt-encrypted passwords, PCI-compliant checkout, encrypt data at rest.  
+* **Optional Alternative:** Integrate Strapi (headless CMS) for easier category/product management if admin tasks grow complex.  
+* **Analytics:** PostHog for lightweight tracking of user behavior (e.g., Impulse Coach/Dupe Finder engagement, social shares) without bloat.
+
+---
+
+#### **📦 Deployment & User Guide**
+
+Include a guide in the admin panel, written with a cheeky tone:
+
+1. **Add a Product:** Admin → Products → Add New → Fill in details → Save. “Congrats, you’re basically running Amazon now.”  
+2. **View Orders:** Orders tab to see purchases and update status. “Keep the punters happy, yeah?”  
+3. **Get Paid:** Stripe deposits funds every 2–3 days. Link bank in Stripe dashboard. “Time to treat yourself, big shot.”  
+4. **Change Design:** Site Settings for logo, colors, footer links. “Make it snazzy, but don’t go full Liberace.”  
+5. **Go Live:** “Publish” button to deploy to https://shopaholicsinc.store. “Ready to take on the e-com giants? Let’s roll.”
+
+---
+
+#### **🧩 Final Requirements**
+
+* No bloat, spam, or gimmicks. Keep it professional, fast, and fun.  
+* Auto-optimize images (WebP \+ compression).  
+* Include a **contact form** (emails to admin@shopaholicsinc.store, with replies like, “Alright, what’s the drama? We’re all ears.”).  
+* Add an **FAQ page** covering shipping, returns, etc., with playful tone (e.g., “Shipping: We’re quick, but we’re not Star Trek beaming yet.”).  
+* Ensure homepage loads in under 2 seconds.
+
+---
+
+C.T.A
+
+Build this end-to-end full-stack e-commerce platform, connecting the frontend, backend, PostgreSQL database, Stripe, and the *Shopaholics Anonymous Mate* with its Dupe Finder. Generate a live preview for review. When I say “Publish,” deploy to [https://shopaholicsinc.com](https://shopaholicsinc.com)
+
