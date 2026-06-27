@@ -20,11 +20,7 @@
   --radius-lg: 16px;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* Note: box-sizing, margin, padding reset is handled by Tailwind v4's @layer base */
 
 html, body {
   background-color: var(--bg);

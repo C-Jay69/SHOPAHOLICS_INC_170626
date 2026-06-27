@@ -43,9 +43,9 @@ export default function HomePage() {
   return (
     <div className="min-h-screen w-full bg-black">
       {/* Hero */}
-      <section className="relative w-full pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+      <section className="relative w-full pt-28 pb-20 lg:pt-36 lg:pb-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/10 pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 relative">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-gray-400 mb-6">
               <Zap size={14} className="text-cyan-400" />
@@ -90,7 +90,7 @@ export default function HomePage() {
 
       {/* Categories */}
       <section className="py-16 border-t border-gray-900">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-white">Shop by Category</h2>
             <Link to="/search" className="text-sm text-gray-500 hover:text-white flex items-center gap-1">
@@ -127,7 +127,7 @@ export default function HomePage() {
 
       {/* Featured Products */}
       <section className="py-16 border-t border-gray-900">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl font-bold text-white">Featured Products</h2>
@@ -160,7 +160,7 @@ export default function HomePage() {
 
       {/* Value Props */}
       <section className="py-16 border-t border-gray-900">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
@@ -192,7 +192,7 @@ export default function HomePage() {
       {/* Newest */}
       {newest.data?.products?.length > 0 && (
         <section className="py-16 border-t border-gray-900">
-          <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-white">Just Landed</h2>
@@ -213,7 +213,7 @@ export default function HomePage() {
 
       {/* CTA */}
       <section className="py-20 border-t border-gray-900">
-        <div className="max-w-3xl mx-auto px-4 text-center">
+        <div className="max-w-3xl mx-auto px-6 sm:px-8 text-center">
           <h2 className="text-3xl lg:text-5xl font-black mb-4">
             Ready to <span className="gradient-text">overspend responsibly</span>?
           </h2>
