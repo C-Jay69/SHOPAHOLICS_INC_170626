@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { db } from "../database";
 import * as schema from "../database/schema";
-import { eq, desc, count, sum } from "drizzle-orm";
+import { eq, desc, count, sum, sql } from "drizzle-orm";
 import { authMiddleware, requireAdmin } from "../middleware/auth";
 
 export const adminRouter = new Hono()
@@ -115,6 +115,73 @@ export const adminRouter = new Hono()
       createdAt: schema.users.createdAt,
     }).from(schema.users).orderBy(desc(schema.users.createdAt));
     return c.json({ users }, 200);
+  })
+  .post("/import-products", requireAdmin, async (c) => {
+    const { rows } = await c.req.json<{ rows: any[] }>();
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return c.json({ error: "No rows provided" }, 400);
+    }
+
+    // Look up categories to map slug/name → id
+    const cats = await db.select().from(schema.categories);
+    const catMap: Record<string, number> = {};
+    cats.forEach((cat) => {
+      catMap[cat.slug] = cat.id;
+      catMap[cat.name.toLowerCase()] = cat.id;
+    });
+
+    const toInsert = rows.map((row) => {
+      const price = parseFloat(row.price) || 0;
+      const comparePrice = row.comparePrice ? parseFloat(row.comparePrice) : null;
+      const stock = parseInt(row.stock) || 0;
+
+      // Resolve categoryId
+      let categoryId: number | null = null;
+      if (row.category) {
+        const key = String(row.category).toLowerCase().trim();
+        categoryId = catMap[key] ?? null;
+      }
+
+      // Parse images — comma-separated URLs or JSON array string
+      let images: string[] = [];
+      if (row.images) {
+        try {
+          images = JSON.parse(row.images);
+        } catch {
+          images = String(row.images).split(",").map((s: string) => s.trim()).filter(Boolean);
+        }
+      }
+
+      // Parse tags
+      let tags: string[] = [];
+      if (row.tags) {
+        try {
+          tags = JSON.parse(row.tags);
+        } catch {
+          tags = String(row.tags).split(",").map((s: string) => s.trim()).filter(Boolean);
+        }
+      }
+
+      const uid = Math.random().toString(36).slice(2, 8);
+      return {
+        name: String(row.name || "Unnamed Product"),
+        sku: row.sku ? String(row.sku) : `SKU-${uid.toUpperCase()}`,
+        slug: String(row.name || "product").toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + uid,
+        description: row.description ? String(row.description) : null,
+        price,
+        comparePrice,
+        brand: row.brand ? String(row.brand) : null,
+        categoryId,
+        stock,
+        images: JSON.stringify(images),
+        tags: JSON.stringify(tags),
+        status: (row.status === "draft" || row.status === "archived") ? row.status : "active",
+        featured: row.featured === "true" || row.featured === true || row.featured === "1",
+      };
+    });
+
+    const inserted = await db.insert(schema.products).values(toInsert).returning({ id: schema.products.id });
+    return c.json({ success: true, count: inserted.length, imported: inserted.length }, 200);
   })
   .post("/seed-admin", async (c) => {
     const ADMIN_EMAIL = "admin@shopaholicsinc.store";

@@ -1,13 +1,37 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import {
   BarChart3, Package, Users, DollarSign, Download, Zap,
-  RefreshCw, ShieldAlert, Brain, CheckCircle, XCircle, Loader
+  RefreshCw, ShieldAlert, Brain, CheckCircle, XCircle, Loader,
+  Upload, FileText, AlertCircle
 } from "lucide-react";
 import { authClient } from "../lib/auth";
 import { getToken } from "../lib/auth";
 import { formatPrice } from "../lib/utils";
+
+function parseCSV(text: string): { headers: string[]; rows: Record<string, string>[] } {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return { headers: [], rows: [] };
+  const headers = lines[0].split(",").map((h) => h.trim().replace(/^"|"$/g, ""));
+  const rows = lines.slice(1).map((line) => {
+    // Handle quoted fields
+    const values: string[] = [];
+    let cur = "";
+    let inQuote = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQuote = !inQuote; }
+      else if (ch === "," && !inQuote) { values.push(cur.trim()); cur = ""; }
+      else { cur += ch; }
+    }
+    values.push(cur.trim());
+    const row: Record<string, string> = {};
+    headers.forEach((h, i) => { row[h] = values[i] ?? ""; });
+    return row;
+  });
+  return { headers, rows };
+}
 
 function authHeaders() {
   const token = getToken();
@@ -21,7 +45,12 @@ export default function Admin() {
   const [seedLog, setSeedLog] = useState<string[]>([]);
   const [genCount, setGenCount] = useState(10);
   const [genCategory, setGenCategory] = useState("electronics");
-  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "users" | "generate">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "users" | "generate" | "import">("overview");
+  // CSV import state
+  const csvInputRef = useRef<HTMLInputElement>(null);
+  const [csvParsed, setCsvParsed] = useState<{ headers: string[]; rows: Record<string, string>[] } | null>(null);
+  const [csvFileName, setCsvFileName] = useState("");
+  const [importLog, setImportLog] = useState<string[]>([]);
 
   // Redirect if not admin
   if (!isPending && (!session || (session.user as any)?.role !== "admin")) {
@@ -114,12 +143,49 @@ export default function Admin() {
       });
   };
 
+  const importMutation = useMutation({
+    mutationFn: async (rows: Record<string, string>[]) => {
+      const res = await fetch("/api/admin/import-products", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ rows }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Import failed");
+      return data;
+    },
+    onSuccess: (data) => {
+      setImportLog([`✓ Successfully imported ${data.count} products`]);
+      setCsvParsed(null);
+      setCsvFileName("");
+      qc.invalidateQueries({ queryKey: ["admin-analytics"] });
+    },
+    onError: (err: any) => setImportLog([`✗ Error: ${err.message}`]),
+  });
+
+  const handleCsvFile = (file: File) => {
+    setCsvFileName(file.name);
+    setImportLog([]);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const parsed = parseCSV(text);
+      if (parsed.rows.length === 0) {
+        setImportLog(["CSV appears empty or malformed"]);
+        return;
+      }
+      setCsvParsed(parsed);
+    };
+    reader.readAsText(file);
+  };
+
   const stats = analyticsQuery.data;
   const tabs = [
     { id: "overview", label: "Overview", icon: BarChart3 },
     { id: "orders", label: "Orders", icon: Package },
     { id: "users", label: "Users", icon: Users },
     { id: "generate", label: "Generate", icon: Zap },
+    { id: "import", label: "Import CSV", icon: Upload },
   ] as const;
 
   return (
@@ -315,6 +381,126 @@ export default function Admin() {
                 {(!usersQuery.data?.users || usersQuery.data.users.length === 0) && (
                   <p className="text-gray-600 text-sm text-center py-8">No users found</p>
                 )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Import CSV Tab */}
+        {activeTab === "import" && (
+          <div className="space-y-6">
+            <div className="card p-6">
+              <div className="flex items-center gap-3 mb-2">
+                <Upload size={20} className="text-cyan-400" />
+                <h3 className="font-bold text-white text-lg">Import Products via CSV</h3>
+              </div>
+              <p className="text-gray-500 text-sm mb-6">
+                Upload a CSV file to bulk-import products. Required column: <code className="text-purple-400 bg-purple-500/10 px-1 rounded">name</code>. Optional:{" "}
+                <code className="text-gray-400 text-xs">sku, price, comparePrice, brand, description, category, stock, images, tags, status, featured</code>
+              </p>
+
+              {/* Drop zone */}
+              <div
+                className="border-2 border-dashed border-gray-700 hover:border-purple-500/50 rounded-xl p-10 text-center cursor-pointer transition-colors"
+                onClick={() => csvInputRef.current?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files[0];
+                  if (file) handleCsvFile(file);
+                }}
+              >
+                <FileText size={40} className="text-gray-600 mx-auto mb-3" />
+                {csvFileName ? (
+                  <p className="text-white font-medium">{csvFileName}</p>
+                ) : (
+                  <>
+                    <p className="text-gray-400 font-medium mb-1">Drop your CSV here or click to browse</p>
+                    <p className="text-gray-600 text-xs">Accepts .csv files</p>
+                  </>
+                )}
+                <input
+                  ref={csvInputRef}
+                  type="file"
+                  accept=".csv,text/csv"
+                  className="hidden"
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCsvFile(f); }}
+                />
+              </div>
+
+              {/* Template download hint */}
+              <div className="mt-3 flex items-start gap-2 text-xs text-gray-600">
+                <AlertCircle size={13} className="shrink-0 mt-0.5" />
+                <span>
+                  Column <code>category</code> should match a category slug (e.g. <code>electronics</code>, <code>fashion</code>).{" "}
+                  Images and tags can be comma-separated values.{" "}
+                  <button
+                    className="text-purple-400 hover:underline"
+                    onClick={() => {
+                      const template = "name,sku,price,comparePrice,brand,description,category,stock,images,tags,status,featured\nSample Product,SKU-001,29.99,49.99,BrandName,A great product,electronics,100,,gadgets,active,false";
+                      const blob = new Blob([template], { type: "text/csv" });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url; a.download = "products-template.csv";
+                      a.click(); URL.revokeObjectURL(url);
+                    }}
+                  >
+                    Download template
+                  </button>
+                </span>
+              </div>
+            </div>
+
+            {/* Preview table */}
+            {csvParsed && csvParsed.rows.length > 0 && (
+              <div className="card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h4 className="font-bold text-white">Preview</h4>
+                    <p className="text-gray-500 text-xs mt-0.5">{csvParsed.rows.length} rows detected · showing first 5</p>
+                  </div>
+                  <button
+                    onClick={() => importMutation.mutate(csvParsed.rows)}
+                    disabled={importMutation.isPending}
+                    className="btn-primary flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+                  >
+                    {importMutation.isPending ? <><Loader size={14} className="animate-spin" /> Importing...</> : <><CheckCircle size={14} /> Import {csvParsed.rows.length} Products</>}
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-gray-500 border-b border-gray-800">
+                        {csvParsed.headers.map((h) => (
+                          <th key={h} className="text-left py-2 px-2 font-medium whitespace-nowrap">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {csvParsed.rows.slice(0, 5).map((row, i) => (
+                        <tr key={i} className="border-b border-gray-800/40">
+                          {csvParsed.headers.map((h) => (
+                            <td key={h} className="py-2 px-2 text-gray-300 max-w-[160px] truncate">{row[h] || <span className="text-gray-700">—</span>}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {csvParsed.rows.length > 5 && (
+                  <p className="text-gray-600 text-xs mt-2 text-center">+ {csvParsed.rows.length - 5} more rows not shown</p>
+                )}
+              </div>
+            )}
+
+            {/* Import log */}
+            {importLog.length > 0 && (
+              <div className={`rounded-xl p-4 text-sm font-mono border ${
+                importLog[0].startsWith("✓")
+                  ? "bg-green-500/5 border-green-500/20 text-green-400"
+                  : "bg-red-500/5 border-red-500/20 text-red-400"
+              }`}>
+                {importLog.map((l, i) => <div key={i}>{l}</div>)}
               </div>
             )}
           </div>
